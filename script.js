@@ -1,32 +1,24 @@
-const https = require('https');
+const os = require('os');
 const fs = require('fs');
-https.get('https://en.m.wikipedia.org/wiki/Tunde_Onakoya', (response) => {
-  console.log('statusCode:', response.statusCode);
-  console.log('headers:', response.headers);
 
-  const filePath = './public/wikipedia.html';
-  const writeStream = fs.createWriteStream(filePath);
+const markdownFile = './public/os-info.md';
 
-  response.on('data', (data) => {
-    writeStream.write(data);
-  });
+const arch = os.arch();
+const uptime = os.uptime();
+const uptimeString = `${Math.floor(uptime / 86400)} days, ${Math.floor((uptime % 86400) / 3600)} hours, ${Math.floor((uptime % 3600))} seconds`;
+const homedir = os.homedir();
 
-  response.on('end', () => {
-    writeStream.end();
-    console.log('Response ended');
-  });
+const markdownContent = `
+# OS Information
 
-  response.on('close', () => {
-    console.log('Connection closed');
-  });
+## Architecture
+${arch}
 
-  response.on('complete', () => {
-    console.log('Response complete');
-  });
+## Uptime
+${uptimeString}
 
-  response.on('error', (error) => {
-    console.log(error);
-  });
-}).on('error', (error) => {
-  console.log(error);
-});
+## Home Directory
+${homedir}
+`;
+
+fs.writeFileSync(markdownFile, markdownContent);
